@@ -67,3 +67,35 @@ export const verifyUser=tryCatch(async(req,res)=>{
         message:"User Registered"
     })
 })
+export const loginUser=tryCatch(async(req,res)=>{
+    const {email,password}=req.body
+    const user=await User.findOne({
+        email
+    })
+    if(!user){
+        return res.status(400).json({
+            message:"Wrong Email"
+        })
+    }
+    const mathPassword=await bcrypt.compare(password,user.password)
+    if(!mathPassword){
+        return res.status(400).json({
+            message:"Wrong Password"
+        })
+    }
+    const token=await jwt.sign({_id:user._id},process.env.JWT_Secret,{expiresIn:"15d"})
+    res.json({
+        message:`Welcome Back ${user.name}`,
+        user,
+        token
+    })
+})
+export const myProfile=tryCatch(async(req,res)=>{
+    const user = await User.findById(req.user._id); // Fetch user details
+    if (!user) {
+        return res.status(404).json({
+            message: "User not found",
+        });
+    }
+    res.json({ user });
+})
