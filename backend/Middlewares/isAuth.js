@@ -1,5 +1,7 @@
 import jwt from "jsonwebtoken"
-import { User } from "../models/User"
+import { User } from "../models/User.js"
+import tryCatch from "./tryCatch.js";
+
 export const isAuth = tryCatch(async (req, res, next) => {
     const token = req.headers.token;
     if (!token) {
@@ -8,6 +10,22 @@ export const isAuth = tryCatch(async (req, res, next) => {
         });
     }
     const verifyToken = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = { _id: verifyToken._id }; // Only attach the user ID
+    // Attach the user details to the request
+    req.user = await User.findById(verifyToken._id)
     next();
 })
+export const isAdmin=(req,res,next)=>{
+    try{
+        if(req.user.role!=="admin"){
+            return res.status(403).json({
+                message:"You are not Admin"
+            })
+        }
+        next()
+    }
+    catch(error){
+        res.status(500).json({
+            message:error.message
+        })
+    }
+}

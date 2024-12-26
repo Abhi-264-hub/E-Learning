@@ -1,10 +1,8 @@
 const tryCatch = (handler) => {
     return (req, res, next) => {
-        handler(req, res, next).catch((error) => {
-            res.status(500).json({
-                message: error.message,
-            });
-        });
+        Promise.resolve(handler(req, res, next)).catch(next); // Pass errors to the default Express error handler
     };
 };
+
 export default tryCatch;
+
