@@ -4,8 +4,10 @@ import { connectDb } from "./Database/db.js";
 import userRouter from "./routes/user.js";
 import adminRouter from "./routes/admin.js";
 import courseRouter from "./routes/course.js";
+import cors from "cors"
 const app=express();
 app.use(express.json())
+app.use(cors())
 app.use("/uploads",express.static("uploads"))
 dotenv.config();
 const port=process.env.PORT;
